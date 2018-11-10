@@ -1,0 +1,25 @@
+hash: 7964aeb51500cf6e237293a0b8c99557f332c16584a7e0200722c3842cb76bdd
+updated: 2018-11-10T21:10:00.309408+05:30
+imports:
+- name: github.com/ashwanthkumar/slack-go-webhook
+  version: 58b9a44feb242f0ced1a85304b1b6af57b770234
+- name: github.com/ashwanthkumar/wasp-cli
+  version: dc83b9b0243a3b6c6e64b987bc7695bd63988c80
+  subpackages:
+  - client
+  - util
+- name: github.com/buger/jsonparser
+  version: 52c6e1462ebdfb4f59765ca13bd8fa1c31b1d7eb
+- name: github.com/gin-gonic/gin
+  version: b869fe1415e4b9eb52f247441830d502aece2d4d
+- name: github.com/moul/http2curl
+  version: 9ac6cf4d929b2fa8fd2d2e6dec5bb0feb4f4911d
+- name: github.com/parnurzeal/gorequest
+  version: a578a48e8d6ca8b01a3b18314c43c6716bb5f5a3
+- name: github.com/pkg/errors
+  version: 059132a15dd08d6704c67711dae0cf35ab991756
+- name: golang.org/x/net
+  version: 0744d001aa8470aaa53df28d32e5ceeb8af9bd70
+  subpackages:
+  - publicsuffix
+testImports: []
