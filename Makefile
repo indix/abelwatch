@@ -1,5 +1,5 @@
 APPNAME = abelwatch
-VERSION=0.0.1
+VERSION=0.0.2
 TESTFLAGS=-v -cover -covermode=atomic -bench=.
 TEST_COVERAGE_THRESHOLD=18
 
