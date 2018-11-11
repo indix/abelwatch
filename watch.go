@@ -1,11 +1,15 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/ashwanthkumar/slack-go-webhook"
 	"github.com/ashwanthkumar/wasp-cli/util"
 	"github.com/buger/jsonparser"
 	"github.com/indix/abelwatch/abel"
@@ -52,9 +56,10 @@ type Watch struct {
 	// Duration can't be zero, it could mean we're trying to run a watch over something that's aggregating forever
 	Duration     int64      `json:"duration"`
 	Condition    *Condition `json:"condition"`
+	SlackChannel string     `json:"slackChannel"`
+	SlackWebhook string
 	NextCheck    int64
 	LastChecked  int64
-	SlackChannel string `json:"slackChannel"`
 
 	stopChannel  chan bool
 	RunWaitGroup sync.WaitGroup
@@ -63,7 +68,7 @@ type Watch struct {
 }
 
 // NewWatch creates a new watch from the input json
-func NewWatch(ID string, rawJSON []byte, abelClient *abel.Abel) *Watch {
+func NewWatch(ID string, rawJSON []byte, abelClient *abel.Abel, slackWebhook string) *Watch {
 	now := time.Now().In(time.UTC)
 
 	var watch Watch
@@ -73,6 +78,7 @@ func NewWatch(ID string, rawJSON []byte, abelClient *abel.Abel) *Watch {
 	watch.NextCheck = abel.NextAggregateWindow(watch.Duration, now)
 	watch.LastChecked = 1000 * now.Unix()
 	watch.AbelClient = abelClient
+	watch.SlackWebhook = slackWebhook
 
 	return &watch
 }
@@ -110,8 +116,26 @@ func (w *Watch) watch() {
 				log.Printf("%v\n", err)
 			}
 			if w.Condition.HasBreached(count) {
-				// TODO: Send a slack message
-				log.Println("TODO: Supposed to send a slack message")
+				attachment := slack.Attachment{}
+				attachment.AddField(slack.Field{Title: "Metric", Value: w.Name, Short: true}).
+					AddField(slack.Field{Title: "Tags", Value: strings.Join(w.Tags, ","), Short: true}).
+					AddField(slack.Field{Title: "Agg. Window", Value: (time.Millisecond * time.Duration(w.Duration)).String(), Short: true}).
+					AddField(slack.Field{Title: "Expected", Value: strconv.FormatInt(w.Condition.Value, 10), Short: true}).
+					AddField(slack.Field{Title: "Actual", Value: strconv.FormatInt(count, 10), Short: true})
+				payload := slack.Payload{
+					Text:        fmt.Sprintf("%s has breached the expected condition %d %s %d", w.String(), count, w.Condition.Op, w.Condition.Value),
+					Username:    "abelwatch",
+					Channel:     w.SlackChannel,
+					IconEmoji:   ":helmet_with_white_cross:",
+					Attachments: []slack.Attachment{attachment},
+				}
+				errs := slack.Send(w.SlackWebhook, "", payload)
+				if len(errs) > 0 {
+					err := combineErrors(errs)
+					log.Printf("[ERROR] Exception Found while posting message to Slack: %s\n", err.Error())
+					log.Fatalf("%v\n", err)
+				}
+				log.Printf("Sent a notification for %s\n", w.String())
 			} else {
 				log.Printf("[TRACE] %s has not breached the expected threshold", w.String())
 			}
@@ -125,5 +149,23 @@ func (w *Watch) watch() {
 
 // String returns the string representation of the metric
 func (w *Watch) String() string {
-	return fmt.Sprintf("%s [%v] at %s", w.Name, w.Tags, (time.Millisecond * time.Duration(w.Duration)).String())
+	if len(w.Tags) > 0 {
+		return fmt.Sprintf("%s with tags[%s] aggregating at %s", w.Name, strings.Join(w.Tags, ","), (time.Millisecond * time.Duration(w.Duration)).String())
+	} else {
+		return fmt.Sprintf("%s with no tags aggregating at %s", w.Name, (time.Millisecond * time.Duration(w.Duration)).String())
+	}
+}
+
+func combineErrors(errs []error) error {
+	if len(errs) == 1 {
+		return errs[0]
+	} else if len(errs) > 1 {
+		msg := "Error(s):"
+		for _, err := range errs {
+			msg += " " + err.Error()
+		}
+		return errors.New(msg)
+	} else {
+		return nil
+	}
 }

@@ -17,7 +17,7 @@ func TestNewWatch(t *testing.T) {
     },
     "slackChannel": "#z_development"
 }`)
-	watch := NewWatch("1", rawJSON, nil)
+	watch := NewWatch("1", rawJSON, nil, "slack_webhook")
 
 	assert.Equal(t, "1", watch.ID)
 	assert.Equal(t, int64(0), watch.Duration)

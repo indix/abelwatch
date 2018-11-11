@@ -17,6 +17,7 @@ type WatchManager struct {
 	RunWaitGroup sync.WaitGroup
 	stopChannel  chan bool
 	idToWatch    map[string]*Watch
+	slackWebhook string
 }
 
 // StartAndWait starts and waits indefinitely for the WatchManager to complete
@@ -55,7 +56,7 @@ func (w *WatchManager) pollUpdatesInWasp() {
 		id := string(key)
 		_, present := w.idToWatch[id]
 		if !present {
-			watch := NewWatch(id, value, w.Abel)
+			watch := NewWatch(id, value, w.Abel, w.slackWebhook)
 			w.idToWatch[id] = watch
 			watch.StartWatching()
 		}
@@ -71,10 +72,11 @@ func (w *WatchManager) Stop() {
 }
 
 // NewWatchManager creates a new instance of WatchManager
-func NewWatchManager(waspClient *waspclient.WASP, abelClient *abel.Abel) *WatchManager {
+func NewWatchManager(waspClient *waspclient.WASP, abelClient *abel.Abel, slackWebhook string) *WatchManager {
 	return &WatchManager{
-		WASP:      waspClient,
-		Abel:      abelClient,
-		idToWatch: make(map[string]*Watch),
+		WASP:         waspClient,
+		Abel:         abelClient,
+		idToWatch:    make(map[string]*Watch),
+		slackWebhook: slackWebhook,
 	}
 }

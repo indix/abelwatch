@@ -13,7 +13,7 @@ import (
 )
 
 var pidFile string
-var slackWebhooks string
+var slackWebhook string
 var waspUrl string
 var abelUrl string
 
@@ -43,13 +43,13 @@ func main() {
 		Url: abelUrl,
 	}
 
-	watcher := NewWatchManager(waspClient, abelClient)
+	watcher := NewWatchManager(waspClient, abelClient, slackWebhook)
 	watcher.StartAndWait()
 }
 
 func defineFlags() {
 	flag.StringVar(&pidFile, "pid", "PID", "File to write PID file")
-	flag.StringVar(&slackWebhooks, "slack-webhook", "", "Comma list of Slack webhooks to post the alert")
+	flag.StringVar(&slackWebhook, "slack-webhook", "", "Comma list of Slack webhooks to post the alert")
 	flag.StringVar(&waspUrl, "wasp-url", "", "WASP URL (Eg. http://wasp.domain.tld:9000) without the trailing slash")
 	flag.StringVar(&abelUrl, "abel-url", "", "Abel URL (Eg. http://abel.domain.tld:3330) without the trailing slash")
 }
