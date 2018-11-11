@@ -23,7 +23,7 @@ func TestNewWatch(t *testing.T) {
 	assert.Equal(t, int64(0), watch.Duration)
 	assert.Equal(t, "<", watch.Condition.Op)
 	assert.Equal(t, int64(10250), watch.Condition.Value)
-	assert.Equal(t, "completed [[www.finishline.com rmn_p1_variant_20180918]] at 0s", watch.String())
+	assert.Equal(t, "completed with tags[www.finishline.com,rmn_p1_variant_20180918] aggregating at 0s", watch.String())
 	assert.Equal(t, int64(-1), watch.NextCheck)
 	assert.Equal(t, true, watch.LastChecked > 1000)
 }
