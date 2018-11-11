@@ -1,5 +1,6 @@
 vendor/
 abelwatch
+abelwatch-*
 *.txt
 PID
 cov_total.out
