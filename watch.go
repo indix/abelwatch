@@ -107,10 +107,11 @@ func (w *Watch) watch() {
 	for running {
 		now := time.Now().In(time.UTC)
 		select {
-		case tick := <-time.After(abel.TimeToNextAggregateWindow(w.Duration, now)):
+		case tick := <-time.After(abel.TimeToNextAggregateWindow(w.Duration, now) + (10 * time.Second)):
 			log.Printf("[INFO] Watching %v at %v\n", w, tick)
 			start := abel.PreviousAggregateWindow(w.Duration, now)
-			count, datatype, err := w.AbelClient.GetCount(w.Name, w.Tags, start, 0, w.Duration)
+			// we want the metric defined both by start and end as the same aggregation window
+			count, datatype, err := w.AbelClient.GetCount(w.Name, w.Tags, start, start, w.Duration)
 			if err != nil || datatype == jsonparser.NotExist {
 				log.Printf("[ERROR] Encountered an error while checking the metric")
 				log.Printf("%v\n", err)
@@ -142,7 +143,7 @@ func (w *Watch) watch() {
 
 		case <-w.stopChannel:
 			running = false
-			log.Printf("[INFO] Stopping to watch (ID=%s) %s [%v] windowed by %d\n", w.ID, w.Name, w.Tags, w.Duration)
+			log.Printf("[INFO] Stopping to watch (ID=%s) %s\n", w.ID, w.String())
 		}
 	}
 }
