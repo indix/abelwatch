@@ -27,3 +27,6 @@ setup:
 	go get -u github.com/wadey/gocovmerge
 	glide install
 
+test:
+	go test ${TESTFLAGS} -coverprofile=abel.txt github.com/indix/abelwatch/abel
+	go test ${TESTFLAGS} -coverprofile=main.txt github.com/indix/abelwatch/
