@@ -1,4 +1,4 @@
-package: github.com/indix/abel-watch
+package: github.com/indix/abelwatch
 import:
 - package: github.com/ashwanthkumar/slack-go-webhook
   version: ~0.2.0
