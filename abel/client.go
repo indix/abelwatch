@@ -10,7 +10,7 @@ import (
 
 // Abel is the client used to contact Abel to query for the required metrics
 type Abel struct {
-	URL string
+	Url string
 }
 
 var request = gorequest.New()
@@ -24,7 +24,7 @@ func (w *Abel) Get(metric string, tags []string) (int64, jsonparser.ValueType, e
 // further start & end. We can also define the window of aggregation using the duration parameter.
 func (w *Abel) GetCount(metric string, tags []string, start int64, end int64, duration int64) (int64, jsonparser.ValueType, error) {
 	requestSoFar := request.
-		Get(w.URL + "/metrics").
+		Get(w.Url + "/metrics").
 		Query("name=" + metric).
 		Query(fmt.Sprintf("duration=%d", duration)).
 		Query(fmt.Sprintf("start=%d", start)).
