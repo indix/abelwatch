@@ -125,5 +125,5 @@ func (w *Watch) watch() {
 
 // String returns the string representation of the metric
 func (w *Watch) String() string {
-	return fmt.Sprintf("%s [%v] at %s", w.Name, w.Tags, time.Duration(w.Duration).String())
+	return fmt.Sprintf("%s [%v] at %s", w.Name, w.Tags, (time.Millisecond * time.Duration(w.Duration)).String())
 }
