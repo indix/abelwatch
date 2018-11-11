@@ -16,6 +16,7 @@ var pidFile string
 var slackWebhook string
 var waspUrl string
 var abelUrl string
+var waspNamespace string
 
 func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.LUTC | log.Lshortfile)
@@ -43,7 +44,7 @@ func main() {
 		Url: abelUrl,
 	}
 
-	watcher := NewWatchManager(waspClient, abelClient, slackWebhook)
+	watcher := NewWatchManager(waspClient, abelClient, slackWebhook, waspNamespace)
 	watcher.StartAndWait()
 }
 
@@ -52,4 +53,5 @@ func defineFlags() {
 	flag.StringVar(&slackWebhook, "slack-webhook", "", "Comma list of Slack webhooks to post the alert")
 	flag.StringVar(&waspUrl, "wasp-url", "", "WASP URL (Eg. http://wasp.domain.tld:9000) without the trailing slash")
 	flag.StringVar(&abelUrl, "abel-url", "", "Abel URL (Eg. http://abel.domain.tld:3330) without the trailing slash")
+	flag.StringVar(&waspNamespace, "wasp-namespace", "dev.abel.watchers.rules", "Namespace in WASP to get the AbelWatch rules")
 }

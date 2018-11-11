@@ -12,12 +12,13 @@ import (
 
 // WatchManager is responsible for managing the life-cycle of all the active Watchs
 type WatchManager struct {
-	WASP         *waspclient.WASP
-	Abel         *abel.Abel
-	RunWaitGroup sync.WaitGroup
-	stopChannel  chan bool
-	idToWatch    map[string]*Watch
-	slackWebhook string
+	WASP          *waspclient.WASP
+	Abel          *abel.Abel
+	RunWaitGroup  sync.WaitGroup
+	stopChannel   chan bool
+	idToWatch     map[string]*Watch
+	slackWebhook  string
+	waspNamespace string
 }
 
 // StartAndWait starts and waits indefinitely for the WatchManager to complete
@@ -48,7 +49,7 @@ func (w *WatchManager) run() {
 
 func (w *WatchManager) pollUpdatesInWasp() {
 	log.Printf("[INFO] Polling WASP for new updates")
-	config, err := w.WASP.Get("dev.abel.watchers.rules")
+	config, err := w.WASP.Get(w.waspNamespace)
 	if err != nil {
 		log.Fatalf("%v\n", err)
 	}
@@ -72,11 +73,12 @@ func (w *WatchManager) Stop() {
 }
 
 // NewWatchManager creates a new instance of WatchManager
-func NewWatchManager(waspClient *waspclient.WASP, abelClient *abel.Abel, slackWebhook string) *WatchManager {
+func NewWatchManager(waspClient *waspclient.WASP, abelClient *abel.Abel, slackWebhook string, waspNamespace string) *WatchManager {
 	return &WatchManager{
-		WASP:         waspClient,
-		Abel:         abelClient,
-		idToWatch:    make(map[string]*Watch),
-		slackWebhook: slackWebhook,
+		WASP:          waspClient,
+		Abel:          abelClient,
+		idToWatch:     make(map[string]*Watch),
+		slackWebhook:  slackWebhook,
+		waspNamespace: waspNamespace,
 	}
 }
