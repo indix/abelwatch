@@ -1,7 +1,7 @@
 APPNAME = abelwatch
 VERSION=0.0.1
 TESTFLAGS=-v -cover -covermode=atomic -bench=.
-TEST_COVERAGE_THRESHOLD=8.0
+TEST_COVERAGE_THRESHOLD=21.0
 
 build:
 	go build -tags netgo -ldflags "-w" -o ${APPNAME} .
@@ -30,3 +30,11 @@ setup:
 test:
 	go test ${TESTFLAGS} -coverprofile=abel.txt github.com/indix/abelwatch/abel
 	go test ${TESTFLAGS} -coverprofile=main.txt github.com/indix/abelwatch/
+
+test-ci: test
+	gocovmerge *.txt > coverage.txt
+	@go tool cover -html=coverage.txt -o coverage.html
+	@go tool cover -func=coverage.txt | grep "total:" | awk '{print $$3}' | sed -e 's/%//' > cov_total.out
+	@bash -c 'COVERAGE=$$(cat cov_total.out);	\
+	echo "Current Coverage % is $$COVERAGE, expected is ${TEST_COVERAGE_THRESHOLD}.";	\
+	exit $$(echo $$COVERAGE"<${TEST_COVERAGE_THRESHOLD}" | bc -l)'

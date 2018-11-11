@@ -2,3 +2,5 @@ vendor/
 abelwatch
 *.txt
 PID
+cov_total.out
+coverage.html
