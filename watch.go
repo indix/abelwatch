@@ -63,12 +63,12 @@ type Watch struct {
 }
 
 // NewWatch creates a new watch from the input json
-func NewWatch(ID string, RawJson []byte, abelClient *abel.Abel) *Watch {
+func NewWatch(ID string, rawJSON []byte, abelClient *abel.Abel) *Watch {
 	now := time.Now().In(time.UTC)
 
 	var watch Watch
-	util.JsonDecode(string(RawJson), &watch)
-	watch.RawJSON = RawJson
+	util.JsonDecode(string(rawJSON), &watch)
+	watch.RawJSON = rawJSON
 	watch.ID = ID
 	watch.NextCheck = abel.NextAggregateWindow(watch.Duration, now)
 	watch.LastChecked = 1000 * now.Unix()
@@ -81,7 +81,11 @@ func NewWatch(ID string, RawJson []byte, abelClient *abel.Abel) *Watch {
 func (w *Watch) StartWatching() {
 	w.stopChannel = make(chan bool)
 	w.RunWaitGroup.Add(1)
-	go w.watch()
+	if w.Duration > int64(0) {
+		go w.watch()
+	} else {
+		log.Printf("[WARN] Not watching %v since it is aggregating forever.", w.String())
+	}
 }
 
 // Stop stops the watching the current metric
@@ -92,6 +96,7 @@ func (w *Watch) Stop() {
 }
 
 func (w *Watch) watch() {
+	fmt.Printf("Starting Watch for %s\n", w.String())
 	running := true
 	for running {
 		now := time.Now().In(time.UTC)
@@ -106,6 +111,7 @@ func (w *Watch) watch() {
 			}
 			if w.Condition.HasBreached(count) {
 				// TODO: Send a slack message
+				fmt.Println("TODO: Supposed to send a slack message")
 			} else {
 				fmt.Printf("%s has not breached the expected threshold", w.String())
 			}
