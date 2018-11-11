@@ -11,7 +11,7 @@ Usage of ./abelwatch:
   -pid string
     	File to write PID file (default "PID")
   -slack-webhook string
-    	Comma list of Slack webhooks to post the alert
+    	Slack webhook to post the alert
   -wasp-namespace string
     	Namespace in WASP to get the AbelWatch rules (default "dev.abel.watchers.rules")
   -wasp-url string

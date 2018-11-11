@@ -50,7 +50,7 @@ func main() {
 
 func defineFlags() {
 	flag.StringVar(&pidFile, "pid", "PID", "File to write PID file")
-	flag.StringVar(&slackWebhook, "slack-webhook", "", "Comma list of Slack webhooks to post the alert")
+	flag.StringVar(&slackWebhook, "slack-webhook", "", "Slack webhook to post the alert")
 	flag.StringVar(&waspUrl, "wasp-url", "", "WASP URL (Eg. http://wasp.domain.tld:9000) without the trailing slash")
 	flag.StringVar(&abelUrl, "abel-url", "", "Abel URL (Eg. http://abel.domain.tld:3330) without the trailing slash")
 	flag.StringVar(&waspNamespace, "wasp-namespace", "dev.abel.watchers.rules", "Namespace in WASP to get the AbelWatch rules")
