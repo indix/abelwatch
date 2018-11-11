@@ -17,10 +17,12 @@ var slackWebhook string
 var waspUrl string
 var abelUrl string
 var waspNamespace string
+var APP_VERSION = "dev-release"
 
 func main() {
 	log.SetFlags(log.Ldate | log.Ltime | log.LUTC | log.Lshortfile)
 	log.SetOutput(os.Stdout)
+	log.Printf("App Version: %s", APP_VERSION)
 
 	defineFlags()
 	flag.Parse()
