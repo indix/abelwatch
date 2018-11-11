@@ -96,29 +96,29 @@ func (w *Watch) Stop() {
 }
 
 func (w *Watch) watch() {
-	fmt.Printf("Starting Watch for %s\n", w.String())
+	log.Printf("[INFO] Starting Watch for %s\n", w.String())
 	running := true
 	for running {
 		now := time.Now().In(time.UTC)
 		select {
 		case tick := <-time.After(abel.TimeToNextAggregateWindow(w.Duration, now)):
-			fmt.Printf("Watching %v at %v\n", w, tick)
+			log.Printf("[INFO] Watching %v at %v\n", w, tick)
 			start := abel.PreviousAggregateWindow(w.Duration, now)
 			count, datatype, err := w.AbelClient.GetCount(w.Name, w.Tags, start, 0, w.Duration)
 			if err != nil || datatype == jsonparser.NotExist {
-				log.Printf("Encountered an error while checking the metric")
+				log.Printf("[ERROR] Encountered an error while checking the metric")
 				log.Printf("%v\n", err)
 			}
 			if w.Condition.HasBreached(count) {
 				// TODO: Send a slack message
-				fmt.Println("TODO: Supposed to send a slack message")
+				log.Println("TODO: Supposed to send a slack message")
 			} else {
-				fmt.Printf("%s has not breached the expected threshold", w.String())
+				log.Printf("[TRACE] %s has not breached the expected threshold", w.String())
 			}
 
 		case <-w.stopChannel:
 			running = false
-			log.Printf("Stopping to watch (ID=%s) %s [%v] windowed by %d\n", w.ID, w.Name, w.Tags, w.Duration)
+			log.Printf("[INFO] Stopping to watch (ID=%s) %s [%v] windowed by %d\n", w.ID, w.Name, w.Tags, w.Duration)
 		}
 	}
 }
