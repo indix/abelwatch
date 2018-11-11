@@ -1,7 +1,7 @@
 APPNAME = abelwatch
 VERSION=0.0.1
 TESTFLAGS=-v -cover -covermode=atomic -bench=.
-TEST_COVERAGE_THRESHOLD=21.0
+TEST_COVERAGE_THRESHOLD=18
 
 build:
 	go build -tags netgo -ldflags "-w" -o ${APPNAME} .
